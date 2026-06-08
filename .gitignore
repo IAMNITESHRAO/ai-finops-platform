@@ -1,0 +1,9 @@
+venv/
+.env
+**pycache**/
+*.parquet
+.idea/
+.vscode/
+.DS_Store
+*.pyc
+
