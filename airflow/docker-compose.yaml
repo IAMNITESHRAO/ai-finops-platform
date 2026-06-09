@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+
+  airflow-init:
+    image: apache/airflow:3.0.2
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    command: airflow db migrate
+
+  airflow-webserver:
+    image: apache/airflow:3.0.2
+    depends_on:
+      - postgres
+      - airflow-init
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ../:/opt/project
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    command: bash -c "airflow db migrate && airflow api-server"
+
+  airflow-scheduler:
+    image: apache/airflow:3.0.2
+    depends_on:
+      - postgres
+      - airflow-init
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ../:/opt/project
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin123
+    command: bash -c "airflow db migrate && airflow scheduler"

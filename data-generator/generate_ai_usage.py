@@ -5,12 +5,18 @@ from datetime import datetime
 
 fake = Faker()
 
-providers = {
-    "OpenAI": ["gpt-4o", "gpt-4.1-mini"],
-    "Claude": ["claude-sonnet", "claude-opus"],
-    "Gemini": ["gemini-2.5-pro", "gemini-flash"],
-    "DeepSeek": ["deepseek-chat", "deepseek-reasoner"]
-}
+providers = [
+    ("OpenAI", 45),
+    ("Claude", 30),
+    ("Gemini", 15),
+    ("DeepSeek", 10)
+]
+
+provider = random.choices(
+    [p[0] for p in providers],
+    weights=[p[1] for p in providers],
+    k=1
+)[0]
 
 teams = [
     "Engineering",
